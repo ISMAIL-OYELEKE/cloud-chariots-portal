@@ -1,0 +1,25 @@
+/* Custom Global Form Modifications */
+
+/* Forces the browser to calculate borders and padding inside the element total height and width */
+input, select {
+    box-sizing: border-box !important;
+}
+
+/* Normalizes the date input field layout rendering across mobile platforms */
+input[type="date"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    min-height: 40px; /* Standardizes box size matching text inputs */
+}
+
+/* Ensure numeric fields drop default webkit increment arrows on mobile layout displays */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
