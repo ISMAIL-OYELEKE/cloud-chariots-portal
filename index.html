@@ -1,85 +1,401 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cloud Chariots Portal</title>
-    
+    <title>Cloud Chariots Internal Staff Portal</title>
     <link rel="icon" type="image/png" href="images/cloud-chariots-logo.png">
     
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: { brand: { 50: '#f0f4ff', 100: '#d9e2ff', 800: '#1e3a8a', 900: '#1e293b' } }
+                }
+            }
+        }
+    </script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-gray-50 font-sans min-h-screen flex flex-col items-center py-10 px-4">
+<body class="h-full bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-200">
 
-    <div class="text-center mb-10 flex flex-col items-center">
-        <img src="images/cloud-chariots-logo.png" alt="Cloud Chariots Logo" class="h-16 w-auto mb-4 object-contain">
-        <h1 class="text-4xl font-extrabold text-blue-900 tracking-tight">CLOUD CHARIOTS</h1>
-        <p class="text-gray-600 mt-2 text-sm uppercase font-semibold tracking-wider">Internal Staff Portal</p>
+    <div id="successBanner" class="fixed top-4 right-4 z-50 transform translate-y-[-100px] opacity-0 bg-emerald-600 text-white font-bold px-6 py-3 rounded-xl shadow-2xl transition-all duration-300 flex items-center gap-2">
+        <i class="fa-solid fa-circle-check"></i> <span id="successBannerMessage">Profile updated successfully</span>
     </div>
 
-    <div class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div id="authContainer" class="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gradient-to-tr from-slate-900 via-indigo-950 to-slate-900">
+        <div class="sm:mx-auto w-full max-w-md text-center">
+            <img src="images/cloud-chariots-logo.png" alt="Logo" class="h-16 mx-auto mb-4 object-contain">
+            <h2 class="text-3xl font-black text-white tracking-tight">CLOUD CHARIOTS</h2>
+            <p class="text-indigo-200 text-xs uppercase font-bold tracking-widest mt-1">Enterprise Management Gateway</p>
+        </div>
+
+        <div class="mt-8 sm:mx-auto w-full max-w-md px-4">
+            <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-2xl border border-slate-200/10">
+                <div class="flex justify-center gap-6 mb-6 border-b border-slate-100 dark:border-slate-700 pb-3">
+                    <button id="tabSignIn" onclick="switchAuthTab('signin')" class="text-indigo-600 dark:text-indigo-400 font-bold border-b-2 border-indigo-600 dark:border-indigo-400 pb-1 text-sm">Account Login</button>
+                    <button id="tabSignUp" onclick="switchAuthTab('signup')" class="text-slate-400 dark:text-slate-500 font-semibold pb-1 text-sm">Staff Onboarding</button>
+                </div>
+
+                <form id="signInForm" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Corporate Email</label>
+                        <input type="email" id="auth_login_email" required class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">System Passcode</label>
+                        <input type="password" id="auth_login_pass" required class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none">
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm shadow-lg">Sign In to Dashboard</button>
+                </form>
+
+                <form id="signUpForm" class="space-y-4 hidden" novalidate>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Full Name</label>
+                        <input type="text" id="auth_reg_name" placeholder="John Doe" class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        <p id="err_reg_name" class="text-[11px] text-rose-500 font-medium mt-1 hidden"></p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Company Email</label>
+                        <input type="email" id="auth_reg_email" placeholder="email@company.com" class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        <p id="err_reg_email" class="text-[11px] text-rose-500 font-medium mt-1 hidden"></p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Secure Passcode</label>
+                        <div class="relative">
+                            <input type="password" id="auth_reg_pass" placeholder="••••••••" class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                            <button type="button" onclick="togglePasswordVisibility('auth_reg_pass')" class="absolute right-3 top-3 text-slate-400 dark:text-slate-500 focus:outline-none"><i class="fa-solid fa-eye text-xs"></i></button>
+                        </div>
+                        <p id="err_reg_pass" class="text-[11px] text-rose-500 font-medium mt-1 hidden"></p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Date of Birth (DOB)</label>
+                        <input type="date" id="auth_reg_dob" class="block w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        <p id="err_reg_dob" class="text-[11px] text-rose-500 font-medium mt-1 hidden"></p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">Access Permission Role</label>
+                        <div class="flex items-center gap-6 bg-slate-50 dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <label class="flex items-center text-sm cursor-pointer select-none">
+                                <input type="radio" name="auth_reg_role" value="Staff" checked class="h-4 w-4 text-indigo-600 border-slate-300 focus:ring-indigo-500">
+                                <span class="ml-2 text-slate-700 dark:text-slate-300 font-medium">Staff Member</span>
+                            </label>
+                            <label class="flex items-center text-sm cursor-pointer select-none">
+                                <input type="radio" name="auth_reg_role" value="Leadership" class="h-4 w-4 text-indigo-600 border-slate-300 focus:ring-indigo-500">
+                                <span class="ml-2 text-slate-700 dark:text-slate-300 font-medium">Leadership/Admin</span>
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" id="btnCompleteOnboarding" disabled class="w-full bg-slate-900 hover:bg-slate-950 text-white font-bold py-2.5 rounded-xl text-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2">
+                        Complete Onboarding
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="portalDashboard" class="h-full hidden flex flex-col overflow-hidden">
         
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">🚗 Daily Transport Tracker</h2>
-            <p class="text-xs text-gray-500 mb-6">Log your daily transport fares. Total counts are sent to leadership at month-end for reimbursement.</p>
-            
-            <form id="transportForm" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Full Name</label>
-                    <input type="text" id="t_name" required class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-blue-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Company Email</label>
-                    <input type="email" id="t_email" required class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-blue-500">
-                </div>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-                    <div class="w-full flex flex-col">
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Date</label>
-                        <input type="date" id="t_date" required class="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-blue-500 box-border">
-                    </div>
-                    <div class="w-full flex flex-col">
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Daily Fare Total (₦)</label>
-                        <input type="number" id="t_amount" placeholder="e.g. 7000" required class="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-blue-500 box-border">
-                    </div>
-                </div>
-                <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-medium py-2 rounded-lg text-sm transition-colors shadow-sm">Submit Daily Entry</button>
-            </form>
-        </div>
+        <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 h-16 flex items-center justify-between px-6 z-20 shrink-0">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="navigateToTab('home')">
+                <img src="images/cloud-chariots-logo.png" alt="Logo" class="h-8 w-auto object-contain">
+                <span class="text-lg font-black text-indigo-900 dark:text-indigo-400 tracking-tight">CLOUD CHARIOTS</span>
+            </div>
 
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">💰 Payday Loan Request</h2>
-            <p class="text-xs text-gray-500 mb-6">Need emergency funds? Request an advance from your current monthly salary cycle instantly.</p>
-            
-            <form id="loanForm" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Full Name</label>
-                    <input type="text" id="l_name" required class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-blue-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Company Email</label>
-                    <input type="email" id="l_email" required class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-blue-500">
-                </div>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-                    <div class="w-full flex flex-col">
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Request Type</label>
-                        <select id="l_type" class="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-blue-500 box-border">
-                            <option value="Custom">Custom Amount</option>
-                            <option value="Full">Full Month Salary</option>
-                        </select>
-                    </div>
-                    <div class="w-full flex flex-col">
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Desired Amount (₦)</label>
-                        <input type="number" id="l_amount" placeholder="e.g. 50000" required class="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-blue-500 box-border">
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <button class="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-lg relative text-xl focus:outline-none" onclick="toggleAlertMenu()">
+                        <i class="fa-solid fa-bell"></i> <span id="notifBadge" class="absolute top-1 right-1 h-2 w-2 rounded-full bg-rose-500 hidden"></span>
+                    </button>
+                    <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-72 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl p-4 text-xs space-y-2 z-50 max-h-80 overflow-y-auto">
+                        <div class="flex justify-between items-center border-b pb-2 mb-1">
+                            <span class="font-bold text-slate-800 dark:text-white text-sm">Portal Alerts Feed</span>
+                            <button onclick="executeNotificationsClear()" class="text-[10px] text-indigo-500 hover:underline">Clear Logs</button>
+                        </div>
+                        <div id="notifItemsContainer" class="space-y-2 divide-y dark:divide-slate-700">
+                            <p class="text-slate-400 py-2 text-center">No structural alerts tracked.</p>
+                        </div>
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-medium py-2 rounded-lg text-sm transition-colors shadow-sm">Submit Loan Request</button>
-            </form>
-        </div>
 
+                <div class="relative">
+                    <button class="flex items-center gap-2 focus:outline-none" onclick="toggleUserDropdownMenu()">
+                        <div class="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-black uppercase" id="avatarDisplayBadge">CC</div>
+                        <span id="navBarName" class="hidden sm:inline text-sm font-semibold text-slate-700 dark:text-slate-300">User</span>
+                    </button>
+                    <div id="userMenuDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl py-1 z-30">
+                        <button onclick="navigateToTab('settings')" class="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"><i class="fa-solid fa-user-gear mr-2"></i> Edit Profile</button>
+                        <hr class="dark:border-slate-700">
+                        <button onclick="executeSessionLogout()" class="w-full text-left px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 font-bold"><i class="fa-solid fa-power-off mr-2"></i> System Sign Out</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 flex overflow-hidden">
+            <aside class="w-16 md:w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col justify-between p-3 z-10 shrink-0 transition-all duration-200">
+                <nav class="space-y-1">
+                    <button onclick="navigateToTab('home')" id="nav-home" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-indigo-600 bg-indigo-50 dark:text-indigo-400 dark:bg-indigo-950/50">
+                        <i class="fa-solid fa-chart-pie text-lg"></i> <span class="hidden md:inline">Dashboard Summary</span>
+                    </button>
+                    <button onclick="navigateToTab('transport')" id="nav-transport" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                        <i class="fa-solid fa-car text-lg"></i> <span class="hidden md:inline">Transport Tracker</span>
+                    </button>
+                    <button onclick="navigateToTab('loan')" id="nav-loan" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                        <i class="fa-solid fa-hand-holding-dollar text-lg"></i> <span class="hidden md:inline">Payday Loan Advance</span>
+                    </button>
+                    <button onclick="navigateToTab('leave')" id="nav-leave" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                        <i class="fa-solid fa-calendar-check text-lg"></i> <span class="hidden md:inline">Leave Request Tracker</span>
+                    </button>
+                    <button onclick="navigateToTab('appraisal')" id="nav-appraisal" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                        <i class="fa-solid fa-arrow-trend-up text-lg"></i> <span class="hidden md:inline">Staff Appraisal Portal</span>
+                    </button>
+                </nav>
+                
+                <button onclick="navigateToTab('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                    <i class="fa-solid fa-user-pen text-lg"></i> <span class="hidden md:inline">Edit Profile</span>
+                </button>
+            </aside>
+
+            <main class="flex-1 overflow-y-auto p-6 md:p-8 bg-slate-50 dark:bg-slate-900 transition-colors">
+                
+                <section id="view-home" class="tab-view space-y-6">
+                    <div class="bg-gradient-to-r from-indigo-900 to-indigo-950 p-6 md:p-8 rounded-3xl text-white shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <div class="flex items-center gap-4">
+                            <div class="h-14 w-14 rounded-2xl bg-white/10 flex items-center justify-center font-black border border-white/10 text-xl text-indigo-200" id="homeProfileAvatar">CC</div>
+                            <div>
+                                <h2 class="text-2xl font-black tracking-tight">Welcome, <span id="userDisplayName">Worker</span>!</h2>
+                                <p class="text-indigo-200 text-xs mt-1">Classification: <span id="userRoleBadge" class="bg-indigo-800 text-indigo-300 px-2 py-0.5 rounded font-bold uppercase ml-1 tracking-wider text-[10px]">Staff</span></p>
+                            </div>
+                        </div>
+                        <div class="bg-white/10 p-4 rounded-2xl border border-white/10 text-center w-full md:w-auto">
+                            <span class="text-[10px] uppercase font-bold tracking-widest text-indigo-200 block mb-1">Available Leave Balance</span>
+                            <span id="displayLeaveBalance" class="text-3xl font-black">21</span> <span class="text-sm font-semibold text-indigo-200">Days</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-indigo-500 transition-all shadow-sm" onclick="navigateToTab('transport')">
+                            <i class="fa-solid fa-car text-indigo-600 dark:text-indigo-400 text-2xl"></i><h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 mt-2 uppercase tracking-wider text-[11px]">Transport Module</h3>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-indigo-500 transition-all shadow-sm" onclick="navigateToTab('loan')">
+                            <i class="fa-solid fa-hand-holding-dollar text-emerald-600 dark:text-emerald-400 text-2xl"></i><h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 mt-2 uppercase tracking-wider text-[11px]">Salary Advance</h3>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-indigo-500 transition-all shadow-sm" onclick="navigateToTab('leave')">
+                            <i class="fa-solid fa-calendar-check text-indigo-600 dark:text-indigo-400 text-2xl"></i><h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 mt-2 uppercase tracking-wider text-[11px]">Time-Off Leaves</h3>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-indigo-500 transition-all shadow-sm" onclick="navigateToTab('appraisal')">
+                            <i class="fa-solid fa-arrow-trend-up text-teal-600 dark:text-teal-400 text-2xl"></i><h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 mt-2 uppercase tracking-wider text-[11px]">Performance Appraisal</h3>
+                        </div>
+                    </div>
+
+                    <div id="leadershipAdminSection" class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-rose-200/60 dark:border-rose-900/40 shadow-lg space-y-6 hidden">
+                        <div>
+                            <h2 class="text-2xl font-black text-rose-950 dark:text-rose-400 flex items-center gap-2"><i class="fa-solid fa-scale-balanced"></i> Management Execution Desk</h2>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Evaluate employee advance logs, authorize leave counts, and update statuses.</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 divide-y md:divide-y-0 md:divide-x dark:divide-slate-700 gap-y-6">
+                            <form id="adminReviewForm" class="space-y-4 pr-0 md:pr-4">
+                                <h3 class="text-xs font-black uppercase text-slate-400 tracking-wider">A. Payday Advance Applications</h3>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Tracking Request ID</label>
+                                    <input type="text" id="adm_id" placeholder="e.g. e4b2a1c5" required class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-slate-900 dark:text-white">
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Action</label>
+                                        <select id="adm_status" class="w-full px-2 py-2 text-xs bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl focus:outline-none text-slate-900 dark:text-white">
+                                            <option value="Approved">Approve</option><option value="Declined">Decline</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Approved ₦</label>
+                                        <input type="number" id="adm_amount" placeholder="Final Amount" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl focus:outline-none text-slate-900 dark:text-white">
+                                    </div>
+                                </div>
+                                <button type="submit" class="w-full bg-rose-900 hover:bg-rose-800 text-white font-bold py-2 rounded-xl text-xs shadow-md">Commit Payout Resolution</button>
+                            </form>
+                            <form id="adminLeaveReviewForm" class="space-y-4 pt-4 md:pt-0 pl-0 md:pl-6">
+                                <h3 class="text-xs font-black uppercase text-slate-400 tracking-wider">B. Time-Off Applications Ledger</h3>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Leave Tracking ID</label>
+                                    <input type="text" id="adm_leave_id" placeholder="e.g. b2c3d4f5" required class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-slate-900 dark:text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Resolution State</label>
+                                    <select id="adm_leave_status" class="w-full px-2 py-2 text-xs bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl focus:outline-none text-slate-900 dark:text-white">
+                                        <option value="Approved">Approve Leave</option><option value="Declined">Decline Leave</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="w-full bg-slate-900 hover:bg-slate-950 text-white font-bold py-2 rounded-xl text-xs border border-slate-700 shadow-md">Commit Leave Resolution</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+                
+                <section id="view-transport" class="tab-view hidden max-w-xl mx-auto bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <h2 class="text-xl font-black mb-1">🚗 Daily Transport Tracker</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mb-6">Log travel metrics for reimbursement processing logs.</p>
+                    <form id="transportForm" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Log Date</label>
+                                <input type="date" id="t_date" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Fare Amount (₦)</label>
+                                <input type="number" id="t_amount" placeholder="e.g. 7000" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-xl text-sm">Submit Daily Entry</button>
+                    </form>
+                </section>
+
+                <section id="view-loan" class="tab-view hidden max-w-xl mx-auto bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <h2 class="text-xl font-black mb-1">💰 Payday Loan Request</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mb-6">Request emergency advanced funds from your current payroll cycle.</p>
+                    <form id="loanForm" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Request Category</label>
+                                <select id="l_type" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none">
+                                    <option value="Custom">Custom Amount</option>
+                                    <option value="Full">Full Month Salary</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Desired Amount (₦)</label>
+                                <input type="number" id="l_amount" placeholder="e.g. 50000" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-sm">Submit Loan Request</button>
+                    </form>
+                </section>
+
+                <section id="view-leave" class="tab-view hidden max-w-xl mx-auto bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <h2 class="text-xl font-black mb-1">📅 Leave Request Tracker</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mb-6">Log formal applications routing to active management desks.</p>
+                    <form id="leaveForm" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Leave Classification</label>
+                            <select id="leave_type" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none">
+                                <option value="Annual">Annual Leave</option>
+                                <option value="Sick">Sick Leave</option>
+                                <option value="Casual">Casual Leave</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Start Date</label>
+                                <input type="date" id="leave_start" required class="w-full px-2 py-2 bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">End Date</label>
+                                <input type="date" id="leave_end" required class="w-full px-2 py-2 bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Total Days</label>
+                                <input type="number" id="leave_days" placeholder="Days" required class="w-full px-2 py-2 bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none">
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-xl text-sm">Route Leave Application</button>
+                    </form>
+                </section>
+
+                <section id="view-appraisal" class="tab-view hidden max-w-xl mx-auto bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <h2 class="text-xl font-black mb-1">📈 Staff Appraisal Portal</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mb-6">Complete periodic self-appraisals for human resources evaluation profiles.</p>
+                    <form id="appraisalForm" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Official Job Title</label>
+                            <input type="text" id="app_title" placeholder="e.g. Senior Cloud Engineer" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Key Operational Wins</label>
+                            <textarea id="app_wins" rows="3" placeholder="Detail milestones..." required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Future Goals</label>
+                            <textarea id="app_goals" rows="2" placeholder="Detail targets..." required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 rounded-xl text-sm">Publish Evaluation Metrics</button>
+                    </form>
+                </section>
+
+                <section id="view-settings" class="tab-view hidden max-w-3xl mx-auto space-y-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <button onclick="navigateToTab('home')" class="text-slate-400 hover:text-slate-600 dark:hover:text-white text-sm font-bold flex items-center gap-2 transition-all"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                    </div>
+
+                    <form id="profileEditForm" class="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-md space-y-6">
+                        <h2 class="text-2xl font-black text-slate-800 dark:text-white border-b pb-3 dark:border-slate-700">Edit Profile</h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="space-y-4">
+                                <h3 class="text-xs font-black uppercase text-indigo-500 tracking-wider">Editable Parameters</h3>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Name</label>
+                                    <input type="text" id="edit_display_name" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Password</label>
+                                    <div class="relative">
+                                        <input type="password" id="edit_pass" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none" placeholder="Leave blank to keep current">
+                                        <button type="button" onclick="togglePasswordVisibility('edit_pass')" class="absolute right-3 top-2.5 text-xs text-slate-400 hover:text-slate-600 focus:outline-none"><i class="fa-solid fa-eye"></i></button>
+                                    </div>
+                                </div>
+                                <div id="confirmPassGroup" class="hidden">
+                                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Confirm Password</label>
+                                    <div class="relative">
+                                        <input type="password" id="edit_pass_confirm" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none" placeholder="Re-enter new password">
+                                        <button type="button" onclick="togglePasswordVisibility('edit_pass_confirm')" class="absolute right-3 top-2.5 text-xs text-slate-400 hover:text-slate-600 focus:outline-none"><i class="fa-solid fa-eye"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                <h3 class="text-xs font-black uppercase text-slate-400 tracking-wider">Corporate Metadata Records</h3>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-1">Company Email</label>
+                                    <p id="edit_display_email" class="w-full px-3 py-2 bg-slate-100 dark:bg-slate-950 border border-transparent rounded-xl text-sm text-slate-400 dark:text-slate-600 font-semibold opacity-60 cursor-not-allowed">-</p>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-1">Access Role</label>
+                                    <p id="edit_display_role" class="w-full px-3 py-2 bg-slate-100 dark:bg-slate-950 border border-transparent rounded-xl text-sm text-slate-400 dark:text-slate-600 font-semibold opacity-60 cursor-not-allowed">-</p>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-1">Date of Birth (DOB)</label>
+                                    <p id="edit_display_dob" class="w-full px-3 py-2 bg-slate-100 dark:bg-slate-950 border border-transparent rounded-xl text-sm text-slate-400 dark:text-slate-600 font-semibold opacity-60 cursor-not-allowed">-</p>
+                                    <span class="block text-[10px] text-slate-400 dark:text-slate-500 mt-1 italic">To correct a mistake in your date of birth, please contact HR.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between border-t pt-5 dark:border-slate-700">
+                            <div>
+                                <p class="text-sm font-bold text-slate-700 dark:text-slate-300">Theme Configurations</p>
+                                <p class="text-xs text-slate-400">Toggle light, dark, or automated sync layout displays.</p>
+                            </div>
+                            <select id="themeSelector" onchange="executeThemeModification(this.value)" class="px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl focus:outline-none text-slate-900 dark:text-white">
+                                <option value="light">☀️ Crisp Light</option>
+                                <option value="dark">🌙 Deep Dark</option>
+                                <option value="system">💻 System Responsive</option>
+                            </select>
+                        </div>
+
+                        <div class="flex justify-end gap-3 border-t pt-4 dark:border-slate-700">
+                            <button type="button" onclick="navigateToTab('home')" class="px-5 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 font-medium">Cancel</button>
+                            <button type="submit" id="btnSaveChanges" disabled class="px-5 py-2 text-sm bg-indigo-600 text-white font-bold rounded-xl shadow-md disabled:opacity-40 disabled:cursor-not-allowed">Save Changes</button>
+                        </div>
+                    </form>
+                </section>
+
+            </main>
+        </div>
     </div>
 
     <script src="app.js"></script>

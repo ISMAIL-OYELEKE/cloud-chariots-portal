@@ -1,19 +1,15 @@
-/* Custom Global Form Modifications */
-
-/* Forces the browser to calculate borders and padding inside the element total height and width */
-input, select {
+/* Custom System Utility Adjustments */
+input, select, textarea {
     box-sizing: border-box !important;
 }
 
-/* Normalizes the date input field layout rendering across mobile platforms */
 input[type="date"] {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    min-height: 40px; /* Standardizes box size matching text inputs */
+    min-height: 40px; 
 }
 
-/* Ensure numeric fields drop default webkit increment arrows on mobile layout displays */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
     -webkit-appearance: none;
@@ -22,4 +18,32 @@ input::-webkit-inner-spin-button {
 
 input[type=number] {
     -moz-appearance: textfield;
+}
+
+/* Tab Viewport Transition Layer Settings */
+.tab-view {
+    animation: fadeViewIn 0.2s ease-out forwards;
+}
+
+@keyframes fadeViewIn {
+    from { opacity: 0; transform: translateY(3px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Strict Specification Profiles: Disabled & Read-Only Component Styling */
+input:disabled, 
+select:disabled, 
+p[id^="edit_display_"] {
+    opacity: 0.60 !important;
+    background-color: #f1f5f9 !important; 
+    cursor: not-allowed !important;
+}
+
+/* Dark Mode Overrides for Disabled Fields */
+.dark input:disabled, 
+.dark select:disabled, 
+.dark p[id^="edit_display_"] {
+    background-color: #0f172a !important; 
+    color: #64748b !important; 
+    border-color: #334155 !important;
 }
