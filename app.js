@@ -5,6 +5,31 @@ const API_BASE_URL = "https://8yvggmh0i0.execute-api.eu-west-2.amazonaws.com";
 let currentUser = { staff_email: "", staff_name: "", role: "", leave_balance: 21, dob: "" };
 let pollIntervalTracker = null;
 
+// MOBILE SIDEBAR HAMBURGER CONTROLLER TOGGLES
+function toggleMobileSidebar() {
+    const sidebar = document.getElementById('sidebarNav');
+    const overlay = document.getElementById('sidebarOverlay');
+    const icon = document.getElementById('hamburgerIcon');
+    
+    if (sidebar.classList.contains('-translate-x-full')) {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        icon.className = "fa-solid fa-xmark"; 
+    } else {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+        icon.className = "fa-solid fa-bars";
+    }
+}
+
+// Router intercept click hook to clean up mobile sidebars automatically upon section shifts
+function handleNavClick(targetTabId) {
+    navigateToTab(targetTabId);
+    if (window.innerWidth < 768) {
+        toggleMobileSidebar(); 
+    }
+}
+
 function switchAuthTab(targetTab) {
     const sInForm = document.getElementById('signInForm'); const sUpForm = document.getElementById('signUpForm');
     const tInBtn = document.getElementById('tabSignIn'); const tUpBtn = document.getElementById('tabSignUp');
@@ -240,7 +265,6 @@ document.getElementById('signInForm').addEventListener('submit', async (e) => {
 window.addEventListener('DOMContentLoaded', () => {
     const cachedSession = localStorage.getItem('cc_user_session');
     if (cachedSession) {
-        console.log("Active corporate tracking session recovered safely.");
         initializeApplicationPortal(JSON.parse(cachedSession));
     }
 });
@@ -268,7 +292,7 @@ function initializeProfileFormFields() {
     document.getElementById('btnSaveChanges').disabled = true;
 }
 
-// FIXED: DECOUPLED DIRT-STATE CHECKER HOOK
+// DIRT-STATE CHECKER HOOK
 function executeDirtyStateCheck() {
     const nameInput = document.getElementById('edit_display_name').value.trim();
     const passInput = document.getElementById('edit_pass').value.trim();
@@ -307,11 +331,7 @@ document.getElementById('profileEditForm').addEventListener('submit', async (e) 
         return;
     }
     
-    const payload = {
-        action: 'update_profile',
-        staff_email: currentUser.staff_email,
-        staff_name: nameInput
-    };
+    const payload = { action: 'update_profile', staff_email: currentUser.staff_email, staff_name: nameInput };
     
     if (passInput.length > 0) {
         if (passInput.length < 8 || !/[A-Z]/.test(passInput) || !/[0-9]/.test(passInput)) {
@@ -327,9 +347,7 @@ document.getElementById('profileEditForm').addEventListener('submit', async (e) 
     
     try {
         const res = await fetch(`${API_BASE_URL}/profile-services`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error);
@@ -354,7 +372,7 @@ document.getElementById('profileEditForm').addEventListener('submit', async (e) 
     } catch (err) { alert(`Update Error: ${err.message}`); }
 });
 
-// CORE TRANSACTIONS ENDPOINTS DISPATCHERS
+// CORE TRANSACTIONS DISPATCHERS
 document.getElementById('transportForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     try {

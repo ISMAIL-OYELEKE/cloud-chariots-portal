@@ -37,6 +37,11 @@ p[id^="edit_display_"] {
     opacity: 0.60 !important;
     background-color: #f1f5f9 !important; 
     cursor: not-allowed !important;
+    display: block !important;
+    width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
 }
 
 /* Dark Mode Overrides for Disabled Fields */
