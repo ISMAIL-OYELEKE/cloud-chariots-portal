@@ -13,13 +13,13 @@ This repository holds **the frontend only**: a static HTML, CSS and JavaScript a
 | `style.css` | Styles |
 | `images/` | Logos |
 
-The backend is **not** in this repository. The frontend talks to it through an Amazon API Gateway HTTP API in `eu-west-2` (London), set as `API_BASE_URL` at the top of `app.js`.
+The backend is **not** in this repository. The frontend talks to it through an Amazon API Gateway API in `eu-west-2` (London).
 
 ## The backend, and where it is documented
 
 The backend and its infrastructure were built in the company's AWS account, so their source and configuration are not public. In outline:
 
-- **Amazon API Gateway** exposes the routes the frontend calls: `/signup`, `/signin`, `/profile-services`, `/request-leave`, `/review-leave`, `/request-loan`, `/review-loan`, `/log-transport` and `/submit-appraisal`.
+- **Amazon API Gateway** receives the frontend's requests for sign in, leave, payroll advances, transport logs and appraisals.
 - **AWS Lambda** functions handle each route.
 - **Amazon DynamoDB** stores request state, sessions and the notification feed.
 - **Amazon SES** sends status emails as a request moves through approval.
